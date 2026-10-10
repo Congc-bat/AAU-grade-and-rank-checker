@@ -41,7 +41,7 @@
  如果这个脚本为你节省了时间，或者觉得很好用，“请我喝一杯奶茶，吃一次学长烤猪蹄”吧！
 ![赞赏码](zanshangma.png)
 2.  **支持**
-手搓邮箱，欢迎试用：https://mail.ahau.yifly.site<a href="[https://mail.ahau.yifly.site" target="_blank">https://mail.ahau.yifly.site</a>
+手搓邮箱，欢迎试用：<a href="https://mail.ahau.yifly.site" target="_blank">https://mail.ahau.yifly.site</a>
 
 ### 💖 捐赠鸣谢
 
