@@ -1,4 +1,4 @@
-# AAU-grade-query-and-AAU-rank-checker
+# AAU-grade-and-rank-checker
 
 这是一个由安徽农业大学本科生设计的成绩与绩点实时排名查询脚本/插件，旨在为您提供便捷的实时/全程绩点专业排名查询体验，支持**一键获取累计GPA、学分统计及各学期与全程专业排名**。
 
