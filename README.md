@@ -33,7 +33,7 @@
     **刷新页面**，然后点击页面上生成的**“一键查询成绩”**按钮，即可快速查看您的各项成绩与排名数据。
     ![成绩排名查询入口](chengjipaimingchaxunrukou.png)
 6.  **抓取结果示例**
-    ![抓取结果示例](chengjipaimingchaxunrukou.png)
+    ![抓取结果示例](chaxunjieguoshili.png)
 
 ## ☕ 赞赏与支持
 
