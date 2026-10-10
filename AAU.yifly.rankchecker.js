@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         安农教务 · 成绩一键查询（GPA / 排名 / 导出）
+// @name         安农教务一键查询
 // @namespace    ahau-grade-helper
 // @version      1.2.0
 // @description  在“我的成绩 / 学生成绩单”页面添加“一键查询成绩”按钮：一次抓取全部学期课程成绩与绩点，汇总全程 + 各学期 GPA、专业排名，支持搜索、只看不及格、复制摘要、导出 CSV。
-// @author       Codex
+// @author       Yifly_Ccong
 // @license      MIT
 // @match        *://*.ahau.edu.cn/*for-std/grade/sheet*
 // @match        *://ahau.edu.cn/*for-std/grade/sheet*
