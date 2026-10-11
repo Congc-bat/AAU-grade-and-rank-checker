@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         安农教务一键查询
+// @name         安农排名一键查
 // @namespace    ahau-grade-helper
-// @version      1.2.0
+// @version      1.2.1
 // @description  在“我的成绩 / 学生成绩单”页面添加“一键查询成绩”按钮：一次抓取全部学期课程成绩与绩点，汇总全程 + 各学期 GPA、专业排名，支持搜索、只看不及格、复制摘要、导出 CSV。
-// @author       Yifly_Ccong
+// @author       @ahau_yifly
 // @license      MIT
 // @match        *://*.ahau.edu.cn/*for-std/grade/sheet*
 // @match        *://ahau.edu.cn/*for-std/grade/sheet*
@@ -14,7 +14,7 @@
 /*
  * 适用页面：安徽农业大学教务系统（EAMS）中路径包含 /for-std/grade/sheet 的
  *          “学生成绩 / 我的成绩”页面。
- *   直接访问：https://bkjw.ahau.edu.cn/student/for-std/grade/sheet/semester-index/27630
+ *   直接访问：https://bkjw.ahau.edu.cn/student/for-std/grade/sheet/semester-index/<学号>
  *   校内 VPN：https://myvpn.ahau.edu.cn/http/<编码>/student/for-std/grade/sheet/...（可能位于 iframe 内）
  *   因此匹配规则只限定 ahau.edu.cn 后缀，不写死子域名与路径前缀；脚本会按当前网址
  *   自动推算接口根路径（VPN 会加一层代理前缀，写死 /student 会请求不到）。
@@ -38,7 +38,8 @@
     cachePrefix: 'anau_grade_cache_v1_', // 成绩缓存
     autoKey: 'anau_grade_auto_query',    // “打开页面自动查询”开关
     cacheTtl: 12 * 60 * 60 * 1000,       // 缓存有效期：12 小时
-    concurrency: 3                       // 并发请求数（不要调太高）
+    concurrency: 3,                      // 并发请求数（不要调太高）
+    brand: '@ahau_yifly'                 // 界面上显示的作者标签，改这一行即可更换
   };
 
   var CTX = (typeof window.CONTEXT_PATH === 'string' && window.CONTEXT_PATH) ? window.CONTEXT_PATH : '/student';
@@ -238,7 +239,7 @@
     };
   }
 
-  /** 从源码里取学号：var studentId = 27630; */
+  /** 从源码里取学号，即页面里形如 var studentId = <数字>; 的那一句 */
   function extractStudentId(source) {
     if (!source) return null;
     var m = /(?:var|let|const)\s+studentId\s*=\s*(\d+)/.exec(source);
@@ -503,7 +504,7 @@
     var stats = data.stats || computeCourseStats(data.courses || []);
     var out = [];
 
-    out.push('学生成绩摘要（学号 ' + (data.studentId || '—') + '）');
+    out.push('学生成绩摘要');
     out.push('统计时间：' + (model.updatedDateTimeStr || '—'));
     out.push('全程平均学分绩点（GPA）：' + formatNum(model.gpa, 2));
     out.push('学院专业全程 GPA 排名：' + (model.majorRank != null ? model.majorRank : '—') +
@@ -533,6 +534,10 @@
         out.push(shortSemesterName(c.semesterName) + ' ' + c.courseName + '：' + c.score +
           '（' + formatNum(c.credits, 1) + ' 学分）');
       });
+    }
+    if (data.brand) {
+      out.push('');
+      out.push(data.brand);
     }
     return out.join('\n');
   }
@@ -769,6 +774,8 @@
       '.anau-panel{width:min(1180px,96vw);height:min(88vh,940px);background:#fff;border-radius:14px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 64px rgba(15,23,42,.38);font-size:14px;color:#1f2937}',
       '.anau-head{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid #eaeef5;background:#fbfdff}',
       '.anau-title{font-size:17px;font-weight:600}',
+      '.anau-brand{display:inline-block;margin-left:8px;padding:2px 9px;border-radius:999px;background:#eef4ff;border:1px solid #cfe0fb;color:#1d4ed8;font-size:12px;font-weight:600;vertical-align:middle}',
+      '.anau-brand-inline{color:#6b7280;font-size:12px;white-space:nowrap}',
       '.anau-sub{font-size:12px;color:#6b7280;font-weight:400;margin-left:6px}',
       '.anau-actions{margin-left:auto;display:flex;gap:8px}',
       '.anau-act{cursor:pointer;border:1px solid #d7dfea;background:#fff;color:#334155;border-radius:6px;padding:6px 12px;font-size:13px}',
@@ -942,6 +949,7 @@
 
     els.bar.innerHTML = parts.join('') +
       '<span class="anau-bar-btns">' +
+      '<span class="anau-brand-inline">' + esc(CONFIG.brand) + '</span>' +
       '<button type="button" class="anau-btn anau-btn-ghost" data-role="bar-open">查看成绩明细</button>' +
       '</span>';
     var open = els.bar.querySelector('[data-role="bar-open"]');
@@ -959,7 +967,8 @@
     mask.innerHTML =
       '<div class="anau-panel" role="dialog" aria-modal="true" aria-label="成绩一键查询">' +
       '  <div class="anau-head">' +
-      '    <div class="anau-title">📊 成绩一键查询<span class="anau-sub" data-role="subtitle"></span></div>' +
+      '    <div class="anau-title">📊 成绩一键查询<span class="anau-brand">' + esc(CONFIG.brand) + '</span>' +
+      '<span class="anau-sub" data-role="subtitle"></span></div>' +
       '    <div class="anau-actions">' +
       '      <button type="button" class="anau-act" data-role="refresh">重新查询</button>' +
       '      <button type="button" class="anau-act" data-role="copy">复制摘要</button>' +
@@ -1107,7 +1116,6 @@
       if (state.loading) bits.push('正在查询…');
       else if (state.fromCache) bits.push('缓存数据（' + timeText(state.loadedAt) + '）');
       else if (state.loadedAt) bits.push('已更新 ' + timeText(state.loadedAt));
-      if (state.studentId) bits.push('学号 ' + state.studentId);
       els.subtitle.textContent = bits.join(' · ');
     }
   }
@@ -1379,12 +1387,12 @@
       subMap: state.subMap,
       majorHeadCount: (state.model || {}).majorHeadCount
     });
-    download('成绩单_' + (state.studentId || '') + '_' + tag + '_' + new Date().toISOString().slice(0, 10) + '.csv', csv);
+    download('成绩单_' + tag + '_' + new Date().toISOString().slice(0, 10) + '.csv', csv);
   }
 
   function copySummary() {
     var text = buildSummaryText({
-      studentId: state.studentId,
+      brand: CONFIG.brand,
       model: state.model,
       subMap: state.subMap,
       semesters: state.semesters,
